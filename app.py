@@ -26,34 +26,47 @@ def home():
             (today, amount, category, note)
         )
         conn.commit()
-        conn.close()
 
     conn = get_db_connection()
-    expenses = conn.execute("SELECT * FROM expenses").fetchall()
-    conn.close()
 
-    total = 0.0
-    category_summary = {}
+    expenses = conn.execute("SELECT * FROM expenses").fetchall()
+
+    total = conn.execute(
+        "SELECT SUM(amount) FROM expenses"
+    ).fetchone()[0] or 0
+
+    category_summary = conn.execute(
+        "SELECT category, SUM(amount) as total FROM expenses GROUP BY category"
+    ).fetchall()
+
     monthly_total = None
-    monthly_summary = {}
+    monthly_summary = []
 
     month = request.args.get("month")
     year = request.args.get("year")
 
-    for exp in expenses:
-        amount = exp["amount"]
-        total += amount
+    if month and year:
+        monthly_total = conn.execute(
+            """
+            SELECT SUM(amount) FROM expenses
+            WHERE strftime('%Y', date) = ?
+            AND strftime('%m', date) = ?
+            """,
+            (year, month.zfill(2))
+        ).fetchone()[0] or 0
 
-        category = exp["category"]
-        category_summary[category] = category_summary.get(category, 0) + amount
+        monthly_summary = conn.execute(
+            """
+            SELECT category, SUM(amount)
+            FROM expenses
+            WHERE strftime('%Y', date) = ?
+            AND strftime('%m', date) = ?
+            GROUP BY category
+            """,
+            (year, month.zfill(2))
+        ).fetchall()
 
-        if month and year:
-            row_year, row_month, _ = exp["date"].split("-")
-            if row_year == year and row_month == month:
-                monthly_total = (monthly_total or 0) + amount
-                monthly_summary[category] = (
-                    monthly_summary.get(category, 0) + amount
-                )
+    conn.close()
 
     return render_template(
         "index.html",
@@ -63,6 +76,7 @@ def home():
         monthly_total=monthly_total,
         monthly_summary=monthly_summary
     )
+
 
 if __name__ == "__main__":
     app.run(debug=True)

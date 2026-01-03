@@ -55,10 +55,11 @@
         <h3>📊 Category Summary</h3>
 
 <ul>
-    {% for cat, amt in category_summary.items() %}
-        <li>{{ cat }}: ₹{{ amt }}</li>
+    {% for row in category_summary %}
+        <li>{{ row[0] }}: ₹{{ row[1] }}</li>
     {% endfor %}
 </ul>
+
     </div>
 </div>
 
@@ -78,10 +79,11 @@
     <h4>Total for selected month: ₹{{ monthly_total }}</h4>
 
     <ul>
-        {% for cat, amt in monthly_summary.items() %}
-            <li>{{ cat }}: ₹{{ amt }}</li>
-        {% endfor %}
-    </ul>
+    {% for row in monthly_summary %}
+        <li>{{ row[0] }}: ₹{{ row[1] }}</li>
+    {% endfor %}
+</ul>
+
 {% endif %}
 
 </div>
