@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+<body>
+    <div class="container">
+        <div class="section">
+            <h2>Add Expense</h2>
+
+    <form method="post">
+        <label>Amount:</label><br>
+        <input type="number" step="0.01" name="amount" required><br><br>
+
+        <label>Category:</label><br>
+        <input type="text" name="category" required><br><br>
+
+        <label>Note:</label><br>
+        <input type="text" name="note"><br><br>
+
+        <button type="submit">Add Expense</button>
+    </form>
+        </div>
+
+    <hr>
+
+    <div class="section">
+        <h2>All Expenses</h2>
+
+    <table border="1" cellpadding="5">
+        <tr>
+            <th>Date</th>
+            <th>Amount</th>
+            <th>Category</th>
+            <th>Note</th>
+        </tr>
+
+        {% for exp in expenses %}
+        <tr>
+            <td>{{ exp[0] }}</td>
+            <td>{{ exp[1] }}</td>
+            <td>{{ exp[2] }}</td>
+            <td>{{ exp[3] }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
+    <div class="section-grid">
+        <div class="card">
+            <h3>💰 Total Expense: ₹{{ total }}</h3>
+        </div>
+    <div class="card">
+        <h3>📊 Category Summary</h3>
+
+<ul>
+    {% for cat, amt in category_summary.items() %}
+        <li>{{ cat }}: ₹{{ amt }}</li>
+    {% endfor %}
+</ul>
+    </div>
+</div>
+
+<div class="section">
+    <h3>📅 Monthly Summary</h3>
+
+<form method="get">
+    <label>Month (MM):</label>
+    <input type="text" name="month" placeholder="01"><br><br>
+
+    <label>Year (YYYY):</label>
+    <input type="text" name="year" placeholder="2026"><br><br>
+
+    <button type="submit">Show Summary</button>
+</form>
+{% if monthly_total is not none %}
+    <h4>Total for selected month: ₹{{ monthly_total }}</h4>
+
+    <ul>
+        {% for cat, amt in monthly_summary.items() %}
+            <li>{{ cat }}: ₹{{ amt }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+</div>
+    </div>
+
+</body>
+</html>
